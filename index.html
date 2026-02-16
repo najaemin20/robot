@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Upload Gallery</title>
+<title>Advanced Upload Gallery</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -148,12 +148,33 @@ header{
     margin:40px auto;
 }
 
-.admin-panel input{
+.admin-panel input, .admin-panel textarea{
     width:100%;
     padding:10px;
     margin:8px 0;
     border-radius:10px;
     border:1px solid #ddd;
+}
+
+.admin-card{
+    background:#f0f0f0;
+    color:#0A1F44;
+    padding:10px;
+    border-radius:12px;
+    margin:10px 0;
+    text-align:left;
+}
+
+.admin-card button{
+    display:inline-block;
+    margin:3px 5px 3px 0;
+    padding:5px 10px;
+    border-radius:10px;
+    background:#ff4d4d;
+    color:white;
+    font-size:12px;
+    border:none;
+    cursor:pointer;
 }
 
 @keyframes fadeIn{
@@ -183,7 +204,7 @@ header{
 <script>
 let data = JSON.parse(localStorage.getItem("galleryData")) || [];
 
-// Simpan ke localStorage
+// Simpan data ke localStorage
 function save(){
     localStorage.setItem("galleryData", JSON.stringify(data));
 }
@@ -205,34 +226,27 @@ function render(items=data){
     document.getElementById("content").innerHTML=html;
 }
 
-// Open modal daftar link
+// Modal daftar link
 function openLinks(index){
     let item=data[index];
     let modal=`
     <div class="modal" onclick="this.remove()">
         <div class="modal-box" onclick="event.stopPropagation()">
             <h3>${item.date}</h3>
-            ${item.links.map(l=>{
-                // pastikan link otomatis https:// jika tidak ada
-                let url=l.url.trim();
-                if(!url.startsWith("http://") && !url.startsWith("https://")){
-                    url="https://"+url;
-                }
-                return `<a class="btn" href="${url}" target="_blank" rel="noopener noreferrer">${l.name}</a>`;
-            }).join("")}
+            ${item.links.map(l=>`<a class="btn" href="${l.url}" target="_blank" rel="noopener noreferrer">${l.name}</a>`).join("")}
             <button class="btn close" onclick="this.closest('.modal').remove()">Tutup</button>
         </div>
     </div>`;
     document.body.insertAdjacentHTML("beforeend",modal);
 }
 
-// Search berdasarkan tanggal
+// Search
 function searchData(keyword){
     let filtered=data.filter(d=>d.date.includes(keyword));
     render(filtered);
 }
 
-// Show admin login
+// Admin login
 function showLogin(){
     document.getElementById("content").innerHTML=`
     <div class="admin-panel">
@@ -243,7 +257,6 @@ function showLogin(){
     </div>`;
 }
 
-// Login admin
 function login(){
     let user=document.getElementById("user").value;
     let pass=document.getElementById("pass").value;
@@ -252,56 +265,76 @@ function login(){
     }else alert("Login salah!");
 }
 
-// Admin dashboard tambah gambar & link
+// Admin dashboard
 function showDashboard(){
     document.getElementById("content").innerHTML=`
     <div class="admin-panel">
         <h2>Tambah Upload</h2>
         <input type="date" id="date">
         <input type="file" id="image" accept="image/*">
-        <div id="linksArea"></div>
-        <button class="btn" onclick="addLinkField()">+ Tambah Link</button>
-        <button class="btn" onclick="addData()">Simpan</button>
+        <textarea id="urls" placeholder="Masukkan URL link, pisahkan spasi, mis: google.com https://cbt.my.id/"></textarea>
+        <button class="btn" onclick="addDataMultiple()">Simpan</button>
         <button class="btn" onclick="render()">Kembali</button>
+        <h3>Daftar Upload</h3>
+        <div id="adminList"></div>
     </div>`;
-    addLinkField();
+    renderAdminList();
 }
 
-// Tambah field link
-function addLinkField(){
-    document.getElementById("linksArea").insertAdjacentHTML("beforeend",`
-        <input type="text" placeholder="Nama Tombol" class="linkName">
-        <input type="text" placeholder="URL Link" class="linkURL">
-    `);
-}
-
-// Simpan data baru
-function addData(){
+// Tambah data dengan banyak link sekaligus
+function addDataMultiple(){
     let date=document.getElementById("date").value;
     let imageFile=document.getElementById("image").files[0];
-    if(!date || !imageFile){alert("Isi tanggal & gambar");return;}
+    let urlsText=document.getElementById("urls").value.trim();
+    if(!date || !imageFile || !urlsText){alert("Isi semua data"); return;}
 
     let reader=new FileReader();
     reader.onload=function(e){
         let links=[];
-        let names=document.querySelectorAll(".linkName");
-        let urls=document.querySelectorAll(".linkURL");
-        for(let i=0;i<names.length;i++){
-            if(names[i].value && urls[i].value){
-                let urlInput=urls[i].value.trim();
-                if(!urlInput.startsWith("http://") && !urlInput.startsWith("https://")){
-                    urlInput="https://"+urlInput;
+        urlsText.split(/\s+/).forEach(url=>{
+            let fixedUrl=url.trim();
+            if(fixedUrl){
+                if(!fixedUrl.startsWith("http://") && !fixedUrl.startsWith("https://")){
+                    fixedUrl="https://"+fixedUrl;
                 }
-                links.push({name:names[i].value,url:urlInput});
+                links.push({name:fixedUrl,url:fixedUrl});
             }
-        }
+        });
         data.push({date:date,image:e.target.result,links:links});
         save();
-        render();
+        renderAdminList();
     };
     reader.readAsDataURL(imageFile);
 }
 
+// Render admin list untuk edit/hapus
+function renderAdminList(){
+    let list=document.getElementById("adminList");
+    list.innerHTML="";
+    data.forEach((item,index)=>{
+        let card=document.createElement("div");
+        card.className="admin-card";
+        card.innerHTML=`<strong>${item.date}</strong>`;
+        // Tombol hapus post
+        let delBtn=document.createElement("button");
+        delBtn.textContent="Hapus Post";
+        delBtn.onclick=()=>{data.splice(index,1); save(); renderAdminList();};
+        card.appendChild(delBtn);
+
+        // Tombol hapus link per item
+        item.links.forEach((l,li)=>{
+            let linkBtn=document.createElement("button");
+            linkBtn.textContent=l.name;
+            linkBtn.style.background="#ffa500";
+            linkBtn.onclick=()=>{item.links.splice(li,1); save(); renderAdminList();};
+            card.appendChild(linkBtn);
+        });
+
+        list.appendChild(card);
+    });
+}
+
+// Render awal
 render();
 </script>
 
