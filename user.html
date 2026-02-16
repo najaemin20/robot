@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Page - Web Super Keren</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: 'Roboto', sans-serif;
+  background:#0b0c10;
+  color:#e0e0e0;
+  min-height:100vh;
+  overflow-x:hidden;
+  padding:0;
+  margin:0;
+}
+
+/* Canvas background tetap */
+#networkCanvas {
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  z-index:-1;
+  background:#0b0c10;
+}
+
+/* Page container */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 100px 20px 60px 20px; /* beri jarak atas untuk header */
+  text-align: center;
+}
+
+/* Header */
+h1,h2,h3 { color:#66fcf1; text-shadow: 0 0 5px #66fcf1; margin-bottom:20px; }
+h1 { font-size:3em; }
+
+/* Input */
+input { 
+  width: 90%; padding:12px; margin:10px 0; border-radius:8px; border:none; font-size:1em; 
+  outline:none;
+}
+
+/* Buttons */
+button {
+  padding: 12px 30px;
+  margin: 10px;
+  font-size: 1.2em;
+  border:none;
+  border-radius:8px;
+  background:#1f2833;
+  color:#66fcf1;
+  cursor:pointer;
+  transition:0.3s;
+}
+button:hover { background:#45a29e; color:#0b0c10; }
+
+/* Post Cards */
+.post-container { display:flex; flex-wrap:wrap; justify-content:center; margin-top:20px; }
+.post {
+  background:#1f2833;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.5);
+  width:300px;
+  margin:10px;
+  padding:15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.post:hover { transform: translateY(-5px); box-shadow:0 10px 25px rgba(0,0,0,0.7); }
+.post img { width:100%; border-radius:10px; margin:10px 0; }
+.post a { color:#66fcf1; text-decoration:none; }
+.post a:hover { text-decoration:underline; }
+
+/* Footer */
+footer {
+  text-align:center;
+  padding:8px 0;
+  font-size:0.9em;
+  color:#45a29e;
+  background: rgba(0,0,0,0.3);
+  position: fixed;
+  bottom:0;
+  width:100%;
+  z-index:10;
+}
+
+/* Responsive */
+@media(max-width:600px){
+  .post { width:95%; }
+  input { width:95%; }
+}
+</style>
+</head>
+<body>
+
+<!-- Canvas Background -->
+<canvas id="networkCanvas"></canvas>
+
+<div class="container">
+  <h1>Postingan</h1>
+
+  <!-- Optional: Input token untuk masuk -->
+  <input type="text" id="tokenInput" placeholder="Masukkan token">
+  <button onclick="loginUser()">Masuk</button>
+
+  <input type="text" id="searchUser" placeholder="Cari postingan" oninput="searchPost()">
+
+  <div id="postsUser" class="post-container"></div>
+  <button onclick="window.location.href='index.html'">Logout</button>
+</div>
+
+<script>
+// ===== Network Canvas Background =====
+const canvas = document.getElementById('networkCanvas');
+const ctx = canvas.getContext('2d');
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
+
+let points = [];
+const pointCount = 80;
+
+for(let i=0;i<pointCount;i++){
+  points.push({
+    x:Math.random()*width,
+    y:Math.random()*height,
+    vx:(Math.random()-0.5)*0.5,
+    vy:(Math.random()-0.5)*0.5
+  });
+}
+
+window.addEventListener('resize',()=>{ width=canvas.width=window.innerWidth; height=canvas.height=window.innerHeight; });
+
+function animateNetwork(){
+  ctx.clearRect(0,0,width,height);
+  for(let i=0;i<points.length;i++){
+    let p=points[i];
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0 || p.x>width) p.vx*=-1;
+    if(p.y<0 || p.y>height) p.vy*=-1;
+
+    for(let j=i+1;j<points.length;j++){
+      let q=points[j];
+      let dist = Math.hypot(p.x-q.x, p.y-q.y);
+      if(dist<150){
+        ctx.strokeStyle='rgba(102,252,241,'+(1-dist/150)+')';
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(p.x,p.y);
+        ctx.lineTo(q.x,q.y);
+        ctx.stroke();
+      }
+    }
+
+    ctx.fillStyle='#66fcf1';
+    ctx.globalAlpha=0.7;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,2,0,Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha=1;
+  }
+  requestAnimationFrame(animateNetwork);
+}
+animateNetwork();
+
+// ===== Postingan User =====
+let posts = JSON.parse(localStorage.getItem('posts') || '[]');
+let userToken = localStorage.getItem('token') || '12345';
+
+function loginUser(){
+  let t = document.getElementById('tokenInput').value;
+  if(t===userToken){
+    alert("Token benar! Postingan akan ditampilkan.");
+    renderPosts();
+  } else {
+    alert("Token salah!");
+  }
+}
+
+function renderPosts(isAdmin=false){
+  let container = isAdmin ? document.getElementById('postsAdmin') : document.getElementById('postsUser');
+  container.innerHTML = '';
+
+  posts.forEach((p,i)=>{
+    let div = document.createElement('div');
+    div.className='post';
+    div.innerHTML = `
+      <h4>${p.name}</h4>
+      ${p.img?`<img src="${p.img}">`:''}
+      <p>${p.date}</p>
+      ${p.links.map(l=>`<a href="${l}" target="_blank">${l}</a><br>`).join('')}
+      ${isAdmin ? `<button onclick="deletePost(${i})">Hapus</button>` : ''}
+    `;
+    container.appendChild(div);
+  });
+}
+
+
+function searchPost(){
+  let keyword = document.getElementById('searchUser').value.toLowerCase();
+  let filtered = posts.filter(p=>p.name.toLowerCase().includes(keyword));
+  let container = document.getElementById('postsUser');
+  container.innerHTML = '';
+  filtered.forEach(p=>{
+    let div = document.createElement('div');
+    div.className='post';
+    div.innerHTML = `
+      <h4>${p.name}</h4>
+      ${p.img?`<img src="${p.img}">`:''}
+      <p>${p.date}</p>
+      ${p.links.map(l=>`<a href="${l}" target="_blank">${l}</a><br>`).join('')}
+    `;
+    container.appendChild(div);
+  });
+}
+</script>
+
+<footer>
+  Created by YourName
+</footer>
+
+</body>
+</html>
