@@ -3,326 +3,392 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced Upload Gallery</title>
-
+<title>Upload Gallery Smooth</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
 <style>
-:root{
-    --primary:#0A1F44;
-    --secondary:#162f75;
-    --accent:#00d4ff;
-    --white:#ffffff;
+:root {
+  --primary: #0A1F44;
+  --secondary: #162f75;
+  --accent: #00d4ff;
+  --white: #ffffff;
 }
 
-*{box-sizing:border-box;}
-body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:linear-gradient(135deg,var(--primary),var(--secondary));
-    color:white;
+/* ===== GLOBAL ===== */
+* { box-sizing: border-box; margin:0; padding:0; }
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  min-height: 100vh;
+  transition: 0.4s;
 }
 
-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:20px 30px;
+/* ===== HEADER ===== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(0,0,0,0.2);
+  position: relative; /* supaya tombol absolute di dalam header */
+}
+header .logo { font-weight: 700; font-size: 22px; cursor: pointer; }
+
+/* ===== ICON HOME ===== */
+.home-icon {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: white;
+  z-index: 1000;
+  transition: 0.3s;
+}
+.home-icon:hover { color: #00d4ff; transform: scale(1.2); }
+
+/* ===== CONTAINER ===== */
+.container {
+  width: 95%;
+  max-width: 1100px;
+  margin: 20px auto;
+  padding-bottom: 60px;
 }
 
-.logo{
-    font-weight:700;
-    font-size:20px;
+/* ===== HOME PAGE ===== */
+.home-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 100px;
 }
+.home-input {
+  width: 250px;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+.fixed-btn {
+  width: 250px;
+  height: 50px;
+  font-size: 16px;
+  border-radius: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background: #00d4ff;
+  color: white;
+  border: none;
+  transition: 0.3s, transform 0.2s;
+}
+.fixed-btn:hover { background: #00aacc; transform: scale(1.05); }
 
-.menu-btn{
-    font-size:26px;
-    cursor:pointer;
-    transition:.3s;
+/* ===== GRID & CARD ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  transition: 0.3s;
 }
-.menu-btn:hover{color:var(--accent);}
+.card {
+  background: white;
+  color: var(--primary);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: 0.3s;
+}
+.card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,212,255,0.5); }
+.card img { width: 100%; height: 180px; object-fit: cover; }
+.card-content { padding: 10px; text-align: center; }
+.card-content h3 { margin: 5px 0; font-size: 16px; }
+.card-content p { margin: 0; font-size: 14px; color: #333; }
 
-.container{
-    width:90%;
-    max-width:1100px;
-    margin:auto;
-    padding-bottom:60px;
+/* ===== MODAL ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
+.modal-box {
+  background: white;
+  color: var(--primary);
+  padding: 25px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  max-height: 70vh;
+  overflow-y: auto;
+  transition: all 0.3s;
+}
+.modal-box a.btn { font-size: 14px; padding: 10px; margin-bottom: 5px; }
 
-.btn{
-    display:block;
-    margin:15px auto;
-    padding:12px 20px;
-    border-radius:25px;
-    background:var(--accent);
-    color:white;
-    font-size:16px;
-    text-decoration:none;
-    cursor:pointer;
-    border:none;
-    transition:.3s;
+/* ===== ADMIN PANEL ===== */
+.admin-panel {
+  background: white;
+  color: var(--primary);
+  padding: 25px;
+  border-radius: 20px;
+  max-width: 500px;
+  margin: 20px auto;
 }
-.btn:hover{background:#00aacc;}
+.admin-card {
+  background: #f0f0f0;
+  color: #0A1F44;
+  padding: 10px;
+  border-radius: 12px;
+  margin: 10px 0;
+  text-align: left;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.admin-card button {
+  display: inline-block;
+  margin: 3px 5px 3px 0;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  border: none;
+  cursor: pointer;
+}
+.admin-card button.edit { background: #00aacc; color: white; }
+.admin-card button.delete { background: #ff4d4d; color: white; }
 
-input, textarea{
-    width:100%;
-    padding:10px;
-    margin:8px 0;
-    border-radius:10px;
-    border:1px solid #ddd;
-}
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+@media (min-width: 601px) and (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 901px) { .grid { grid-template-columns: repeat(3, 1fr); } }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:20px;
-}
-
-.card{
-    background:white;
-    color:var(--primary);
-    border-radius:20px;
-    overflow:hidden;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
-    cursor:pointer;
-    transition:.4s;
-}
-.card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 15px 40px rgba(0,212,255,0.5);
-}
-.card img{
-    width:100%;
-    height:200px;
-    object-fit:cover;
-}
-.card-content{padding:15px;text-align:center;}
-
-/* MODAL */
-.modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.7);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:1000;
-}
-.modal-box{
-    background:white;
-    color:var(--primary);
-    padding:30px;
-    border-radius:20px;
-    width:90%;
-    max-width:400px;
-    text-align:center;
-}
-
-.admin-panel{background:white;color:var(--primary);padding:25px;border-radius:20px;max-width:500px;margin:20px auto;}
-.admin-card{background:#f0f0f0;color:#0A1F44;padding:10px;border-radius:12px;margin:10px 0;text-align:left;}
-.admin-card button{display:inline-block;margin:3px 5px 3px 0;padding:5px 10px;border-radius:10px;background:#ff4d4d;color:white;font-size:12px;border:none;cursor:pointer;}
-.admin-card button.edit{background:#00aacc;}
 </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">UPLOAD GALLERY</div>
+  <div class="logo">UPLOAD GALLERY</div>
 </header>
 
 <div class="container" id="container"></div>
 
+<footer style="text-align:center;padding:15px;background:rgba(0,0,0,0.2);color:white;font-size:14px;">
+  &copy; 2026 Upload Gallery | Developed by Kamu
+</footer>
+
 <script>
-// ====== DATA ======
-let data = JSON.parse(localStorage.getItem("galleryData")) || [];
-let token = localStorage.getItem("accessToken") || "1234"; // default token
+// ===== DATA =====
+let data = [];
+let token = localStorage.getItem("accessToken") || "12345";
 
-// ====== HALAMAN AWAL ======
-function showHomePage(){
-    document.getElementById("container").innerHTML=`
-    <button class="btn" onclick="enterToken()">Masukkan Kode/Token</button>
-    <button class="btn" onclick="showLogin()">Login Admin</button>
-    `;
-}
-showHomePage();
+function fixUrl(url){ return url.startsWith("http")? url : "https://" + url; }
+function saveData(){ localStorage.setItem("galleryData", JSON.stringify(data)); }
+function loadData(){ let stored = localStorage.getItem("galleryData"); if(stored) data = JSON.parse(stored); }
+loadData();
 
-// ====== TOKEN ======
-function enterToken(){
-    let userToken = prompt("Masukkan Kode/Token:");
-    if(userToken === token){
-        showMainMenu();
-    } else{
-        alert("Kode/Token salah!");
-    }
-}
+// ===== HOME ICON =====
+function showHomeIcon(){
+  const header = document.querySelector('header');
+  if(!document.querySelector('.home-icon')){
+    const homeBtn = document.createElement('button');
+    homeBtn.className = 'home-icon';
+    homeBtn.innerHTML = '🏠';
+    homeBtn.title = 'Home';
 
-// ====== MENU UTAMA ======
-function showMainMenu(){
-    document.getElementById("container").innerHTML=`
-    <div class="search-box">
-        <input type="text" placeholder="Cari tanggal upload..." onkeyup="searchData(this.value)">
-    </div>
-    <div id="content"></div>
-    `;
-    render();
-}
-
-// ====== RENDER GRID ======
-function render(items=data){
-    let html='<div class="grid">';
-    items.forEach((item,index)=>{
-        html+=`
-        <div class="card" onclick="openLinks(${index})">
-            <img src="${item.image}">
-            <div class="card-content">
-                <h3>${item.date}</h3>
-                <small>Klik untuk lihat link</small>
-            </div>
-        </div>`;
+    // Event handler yang langsung memanggil menu utama
+    homeBtn.addEventListener('click', () => {
+      showMainMenu();
     });
-    html+='</div>';
-    document.getElementById("content").innerHTML=html;
+
+    header.appendChild(homeBtn);
+  }
 }
 
-// ====== MODAL LINK ======
+
+// ===== HOME PAGE =====
+function showHomePage(){
+  document.getElementById("container").innerHTML = `
+    <div class="home-wrapper">
+      <h2>Masukkan Kode untuk Akses</h2>
+      <input type="text" id="inputToken" placeholder="Masukkan kode..." class="home-input">
+      <button class="fixed-btn" onclick="checkToken()">Masuk</button>
+      <button class="fixed-btn" onclick="showLogin()">Login Admin</button>
+    </div>
+  `;
+}
+
+function checkToken(){
+  let userToken = document.getElementById("inputToken").value;
+  if(userToken === token){
+    showMainMenu();
+    showHomeIcon();
+  } else {
+    alert("Kode/Token salah!");
+  }
+}
+
+// ===== MENU UTAMA =====
+function showMainMenu(){
+  document.getElementById("container").innerHTML = `
+    <input type="text" id="searchInput" placeholder="Cari tanggal upload..." style="font-size:14px;padding:10px;margin-bottom:12px;width:100%;">
+    <div id="content"></div>
+  `;
+  document.getElementById("searchInput").addEventListener("input", ()=>{
+    searchData(document.getElementById("searchInput").value);
+  });
+  render();
+}
+
+function render(items = data){
+  let html = '<div class="grid">';
+  items.forEach((item,index)=>{
+    html += `
+      <div class="card" onclick="openLinks(${index})">
+        <img src="${item.image}">
+        <div class="card-content"><h3>${item.title||item.date}</h3><p>${item.date}</p></div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  document.getElementById("content").innerHTML = html;
+}
+
+// ===== MODAL =====
+function animateModalLinks(modalBox){
+  const buttons = modalBox.querySelectorAll('a.btn');
+  buttons.forEach((btn,i)=>{
+    btn.style.opacity="0"; btn.style.transform="translateY(20px)";
+    setTimeout(()=>{
+      btn.style.transition = `all 0.4s ease ${i*0.08}s`;
+      btn.style.opacity="1"; btn.style.transform="translateY(0)";
+    },50);
+  });
+}
+
 function openLinks(index){
-    let item=data[index];
-    let modal=`
-    <div class="modal" onclick="this.remove()">
-        <div class="modal-box" onclick="event.stopPropagation()">
-            <h3>${item.date}</h3>
-            ${item.links.map(l=>{
-                let url=l.url.trim();
-                if(!url.startsWith("http://") && !url.startsWith("https://")){
-                    url="https://"+url;
-                }
-                return `<a class="btn" href="${url}" target="_blank" rel="noopener noreferrer">${l.name}</a>`;
-            }).join("")}
-            <button class="btn" onclick="this.closest('.modal').remove()">Tutup</button>
-        </div>
-    </div>`;
-    document.body.insertAdjacentHTML("beforeend",modal);
+  let item = data[index];
+  let modal = document.createElement("div");
+  modal.className = "modal";
+  modal.innerHTML = `
+    <div class="modal-box">
+      <h3>${item.title||item.date}</h3>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+        ${item.links.map(l=>`<a class="btn" href="${fixUrl(l.url)}" target="_blank">${l.name}</a>`).join('')}
+      </div>
+      <button class="btn" style="margin-top:10px;" onclick="this.closest('.modal').remove()">Tutup</button>
+    </div>
+  `;
+  modal.onclick = () => modal.remove();
+  modal.querySelector(".modal-box").onclick = e => e.stopPropagation();
+  document.body.appendChild(modal);
+  animateModalLinks(modal.querySelector(".modal-box"));
 }
 
-// ====== SEARCH ======
+// ===== SEARCH =====
 function searchData(keyword){
-    let filtered=data.filter(d=>d.date.includes(keyword));
-    render(filtered);
+  let filtered = data.filter(d => d.date.includes(keyword) || (d.title && d.title.toLowerCase().includes(keyword.toLowerCase())));
+  render(filtered);
 }
 
-// ====== LOGIN ADMIN ======
+// ===== LOGIN ADMIN =====
 function showLogin(){
-    document.getElementById("container").innerHTML=`
+  document.getElementById("container").innerHTML = `
     <div class="admin-panel">
-        <h2>Login Admin</h2>
-        <input type="text" id="user" placeholder="Username">
-        <input type="password" id="pass" placeholder="Password">
-        <button class="btn" onclick="login()">Login</button>
-        <button class="btn" onclick="showHomePage()">Kembali</button>
-    </div>`;
+      <h2>Login Admin</h2>
+      <input type="text" id="user" placeholder="Username">
+      <input type="password" id="pass" placeholder="Password">
+      <button class="btn" onclick="login()">Login</button>
+      <button class="btn" onclick="showHomePage()">Kembali</button>
+    </div>
+  `;
 }
 
 function login(){
-    let user=document.getElementById("user").value;
-    let pass=document.getElementById("pass").value;
-    if(user==="admin" && pass==="admin123"){
-        showAdminDashboard();
-    }else alert("Login salah!");
+  let user = document.getElementById("user").value;
+  let pass = document.getElementById("pass").value;
+  if(user==="admin" && pass==="admin123"){ showAdminDashboard(); } 
+  else alert("Login salah!");
 }
 
-// ====== DASHBOARD ADMIN ======
+// ===== DASHBOARD ADMIN =====
 function showAdminDashboard(){
-    document.getElementById("container").innerHTML=`
+  document.getElementById("container").innerHTML = `
     <div class="admin-panel">
-        <h2>Admin Dashboard</h2>
-        <h3>Ubah Kode/Token Akses</h3>
-        <input type="text" id="newToken" placeholder="Masukkan kode baru">
-        <button class="btn" onclick="updateToken()">Simpan Token</button>
-        <hr>
-        <h3>Tambah Upload</h3>
-        <input type="date" id="date">
-        <input type="file" id="image" accept="image/*">
-        <textarea id="urls" placeholder="Masukkan URL link, pisahkan spasi, mis: google.com https://cbt.my.id/"></textarea>
-        <button class="btn" onclick="addDataMultiple()">Simpan Upload</button>
-        <hr>
-        <h3>Daftar Upload</h3>
-        <div id="adminList"></div>
-        <button class="btn" onclick="showHomePage()">Kembali ke Halaman Awal</button>
-    </div>`;
-    renderAdminList();
+      <h2>Admin Dashboard</h2>
+      <h3>Ubah Kode/Token Akses</h3>
+      <input type="text" id="newToken" placeholder="Masukkan kode baru">
+      <button class="btn" onclick="updateToken()">Simpan Token</button>
+      <hr>
+      <h3>Tambah Post</h3>
+      <input type="text" id="title" placeholder="Judul Post">
+      <input type="date" id="date">
+      <input type="file" id="image" accept="image/*">
+      <textarea id="urls" placeholder="Masukkan URL link, pisahkan spasi"></textarea>
+      <button class="btn" onclick="addDataMultiple()">Simpan Post</button>
+      <hr>
+      <h3>Daftar Upload</h3>
+      <div id="adminList"></div>
+      <button class="btn" onclick="showHomePage()">Kembali ke Halaman Awal</button>
+    </div>
+  `;
+  renderAdminList();
 }
 
-// ====== UPDATE TOKEN ======
 function updateToken(){
-    let newToken=document.getElementById("newToken").value.trim();
-    if(newToken){
-        token=newToken;
-        localStorage.setItem("accessToken", token);
-        alert("Token berhasil diubah!");
-    } else alert("Masukkan kode baru!");
+  let newToken = document.getElementById("newToken").value.trim();
+  if(newToken){ token=newToken; localStorage.setItem("accessToken",token); alert("Token berhasil diubah!"); }
+  else alert("Masukkan kode baru!");
 }
 
-// ====== ADD DATA MULTIPLE ======
 function addDataMultiple(){
-    let date=document.getElementById("date").value;
-    let imageFile=document.getElementById("image").files[0];
-    let urlsText=document.getElementById("urls").value.trim();
-    if(!date || !imageFile || !urlsText){alert("Isi semua data"); return;}
-
-    let reader=new FileReader();
-    reader.onload=function(e){
-        let links=[];
-        urlsText.split(/\s+/).forEach(url=>{
-            let fixedUrl=url.trim();
-            if(fixedUrl){
-                if(!fixedUrl.startsWith("http://") && !fixedUrl.startsWith("https://")){
-                    fixedUrl="https://"+fixedUrl;
-                }
-                links.push({name:fixedUrl,url:fixedUrl});
-            }
-        });
-        data.push({date:date,image:e.target.result,links:links});
-        localStorage.setItem("galleryData", JSON.stringify(data));
-        renderAdminList();
-    };
-    reader.readAsDataURL(imageFile);
+  let title = document.getElementById("title").value.trim();
+  let date = document.getElementById("date").value;
+  let imageFile = document.getElementById("image").files[0];
+  let urlsText = document.getElementById("urls").value.trim();
+  if(!date || !imageFile || !urlsText){ alert("Isi semua data!"); return; }
+  let reader = new FileReader();
+  reader.onload = function(e){
+    let links = urlsText.split(/\s+/).map(url=>({name:url,url:fixUrl(url)}));
+    data.push({title,date,image:e.target.result,links});
+    saveData(); renderAdminList();
+    document.getElementById("title").value=""; document.getElementById("date").value=""; document.getElementById("image").value=""; document.getElementById("urls").value="";
+  };
+  reader.readAsDataURL(imageFile);
 }
 
-// ====== RENDER ADMIN LIST ======
 function renderAdminList(){
-    let list=document.getElementById("adminList");
-    list.innerHTML="";
-    data.forEach((item,index)=>{
-        let card=document.createElement("div");
-        card.className="admin-card";
-        card.innerHTML=`<strong>${item.date}</strong>`;
-        
-        // Hapus post
-        let delBtn=document.createElement("button");
-        delBtn.textContent="Hapus Post";
-        delBtn.onclick=()=>{data.splice(index,1); localStorage.setItem("galleryData",JSON.stringify(data)); renderAdminList();};
-        card.appendChild(delBtn);
+  let list = document.getElementById("adminList"); list.innerHTML="";
+  data.forEach((item,index)=>{
+    let card = document.createElement("div"); card.className="admin-card";
+    let titleElem = document.createElement("strong"); titleElem.textContent=item.title||item.date; titleElem.style.flex="1 1 100%"; card.appendChild(titleElem);
 
-        // Hapus link per post
-        item.links.forEach((l,li)=>{
-            let linkBtn=document.createElement("button");
-            linkBtn.textContent=l.name;
-            linkBtn.className="edit";
-            linkBtn.onclick=()=>{
-                item.links.splice(li,1);
-                localStorage.setItem("galleryData",JSON.stringify(data));
-                renderAdminList();
-            };
-            card.appendChild(linkBtn);
-        });
+    let delBtn = document.createElement("button"); delBtn.textContent="Hapus Post"; delBtn.className="delete";
+    delBtn.onclick = ()=>{ if(confirm("Yakin ingin hapus post ini?")){ data.splice(index,1); saveData(); renderAdminList(); } }; card.appendChild(delBtn);
 
-        list.appendChild(card);
+    item.links.forEach((l,li)=>{
+      let linkBtn = document.createElement("button"); linkBtn.textContent=l.name; linkBtn.className="edit";
+      linkBtn.onclick = ()=>{ if(confirm(`Hapus link "${l.name}"?`)){ item.links.splice(li,1); saveData(); renderAdminList(); } }; card.appendChild(linkBtn);
     });
+
+    list.appendChild(card);
+  });
 }
 
-// ====== RENDER AWAL ======
-render();
-</script>
+// ===== INISIALISASI =====
+document.querySelector(".logo").addEventListener("click", showMainMenu);
+window.addEventListener("load", showHomePage);
 
+</script>
 </body>
 </html>
