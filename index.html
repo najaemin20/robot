@@ -3,392 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Gallery Smooth</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Web Super Keren - Landing Page</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --primary: #0A1F44;
-  --secondary: #162f75;
-  --accent: #00d4ff;
-  --white: #ffffff;
-}
-
-/* ===== GLOBAL ===== */
 * { box-sizing: border-box; margin:0; padding:0; }
 body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  min-height: 100vh;
-  transition: 0.4s;
+  font-family: 'Roboto', sans-serif;
+  background:#0b0c10;
+  color:#e0e0e0;
+  min-height:100vh;
+  overflow-x:hidden;
+  padding:0;
+  margin:0;
 }
 
-/* ===== HEADER ===== */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  background: rgba(0,0,0,0.2);
-  position: relative; /* supaya tombol absolute di dalam header */
-}
-header .logo { font-weight: 700; font-size: 22px; cursor: pointer; }
-
-/* ===== ICON HOME ===== */
-.home-icon {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 24px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: white;
-  z-index: 1000;
-  transition: 0.3s;
-}
-.home-icon:hover { color: #00d4ff; transform: scale(1.2); }
-
-/* ===== CONTAINER ===== */
-.container {
-  width: 95%;
-  max-width: 1100px;
-  margin: 20px auto;
-  padding-bottom: 60px;
-}
-
-/* ===== HOME PAGE ===== */
-.home-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 100px;
-}
-.home-input {
-  width: 250px;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  text-align: center;
-}
-.fixed-btn {
-  width: 250px;
-  height: 50px;
-  font-size: 16px;
-  border-radius: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  background: #00d4ff;
-  color: white;
-  border: none;
-  transition: 0.3s, transform 0.2s;
-}
-.fixed-btn:hover { background: #00aacc; transform: scale(1.05); }
-
-/* ===== GRID & CARD ===== */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-  transition: 0.3s;
-}
-.card {
-  background: white;
-  color: var(--primary);
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: 0.3s;
-}
-.card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,212,255,0.5); }
-.card img { width: 100%; height: 180px; object-fit: cover; }
-.card-content { padding: 10px; text-align: center; }
-.card-content h3 { margin: 5px 0; font-size: 16px; }
-.card-content p { margin: 0; font-size: 14px; color: #333; }
-
-/* ===== MODAL ===== */
-.modal {
+/* Canvas background */
+#networkCanvas {
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  top:0; left:0;
+  width:100%; height:100%;
+  z-index:-1;
+  background:#0b0c10;
 }
-.modal-box {
-  background: white;
-  color: var(--primary);
-  padding: 25px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  max-height: 70vh;
-  overflow-y: auto;
-  transition: all 0.3s;
-}
-.modal-box a.btn { font-size: 14px; padding: 10px; margin-bottom: 5px; }
 
-/* ===== ADMIN PANEL ===== */
-.admin-panel {
-  background: white;
-  color: var(--primary);
-  padding: 25px;
-  border-radius: 20px;
-  max-width: 500px;
-  margin: 20px auto;
+/* Landing container */
+#landing {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  text-align:center;
+  padding:0 20px;
 }
-.admin-card {
-  background: #f0f0f0;
-  color: #0A1F44;
-  padding: 10px;
-  border-radius: 12px;
-  margin: 10px 0;
-  text-align: left;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.admin-card button {
-  display: inline-block;
-  margin: 3px 5px 3px 0;
-  padding: 5px 10px;
-  border-radius: 10px;
-  font-size: 12px;
-  border: none;
-  cursor: pointer;
-}
-.admin-card button.edit { background: #00aacc; color: white; }
-.admin-card button.delete { background: #ff4d4d; color: white; }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-@media (min-width: 601px) and (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 901px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+/* Heading */
+#landing h1 { 
+  font-size:3em; 
+  color:#66fcf1; 
+  margin-bottom:50px; 
+  text-shadow:0 0 5px #66fcf1;
+}
 
+/* Buttons */
+#landing button {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  padding:20px 50px;
+  font-size:1.5em;
+  border-radius:12px;
+  border:none;
+  background:#1f2833;
+  color:#66fcf1;
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  transition:0.3s;
+  margin:15px 0;
+}
+#landing button:hover { background:#45a29e; color:#0b0c10; }
+
+/* Footer */
+footer {
+  text-align:center;
+  padding:8px 0;
+  font-size:0.9em;
+  color:#45a29e;
+  background: rgba(0,0,0,0.3);
+  position: fixed;
+  bottom:0;
+  width:100%;
+  z-index:10;
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">UPLOAD GALLERY</div>
-</header>
+<!-- Canvas Background -->
+<canvas id="networkCanvas"></canvas>
 
-<div class="container" id="container"></div>
+<div id="landing">
+  <h1>Selamat Datang di Web Super Keren!</h1>
 
-<footer style="text-align:center;padding:15px;background:rgba(0,0,0,0.2);color:white;font-size:14px;">
-  &copy; 2026 Upload Gallery | Developed by Kamu
-</footer>
+  <!-- Tombol Masuk Admin -->
+  <button onclick="window.location.href='admin.html'">
+    <span style="display:flex; align-items:center; gap:8px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#66fcf1" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20c0-4 8-4 8-4s8 0 8 4v2H4v-2z"/>
+      </svg>
+      Masuk Admin
+    </span>
+  </button>
+
+  <!-- Tombol Masuk User -->
+  <button onclick="window.location.href='user.html'">
+    <span style="display:flex; align-items:center; gap:8px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#66fcf1" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="7" cy="8" r="3"/>
+        <circle cx="17" cy="8" r="3"/>
+        <path d="M2 20c0-3 5-4 5-4s5 1 5 4v2H2v-2z"/>
+        <path d="M12 20c0-3 5-4 5-4s5 1 5 4v2h-10v-2z"/>
+      </svg>
+      Masuk User
+    </span>
+  </button>
+
+  <!-- Tombol Telegram -->
+  <button onclick="window.open('https://t.me/username', '_blank')">
+    <span style="display:flex; align-items:center; gap:8px;">
+      <svg width="24" height="24" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="120" cy="120" r="120" fill="#66fcf1"/>
+        <path d="M50 120 L190 80 L160 140 L120 120 L80 140 Z" fill="#0b0c10"/>
+      </svg>
+      Telegram
+    </span>
+  </button>
+</div>
 
 <script>
-// ===== DATA =====
-let data = [];
-let token = localStorage.getItem("accessToken") || "12345";
+// ===== Network Canvas Background =====
+const canvas = document.getElementById('networkCanvas');
+const ctx = canvas.getContext('2d');
+let width = canvas.width = window.innerWidth;
+let height = canvas.height = window.innerHeight;
 
-function fixUrl(url){ return url.startsWith("http")? url : "https://" + url; }
-function saveData(){ localStorage.setItem("galleryData", JSON.stringify(data)); }
-function loadData(){ let stored = localStorage.getItem("galleryData"); if(stored) data = JSON.parse(stored); }
-loadData();
+let points = [];
+const pointCount = 80;
 
-// ===== HOME ICON =====
-function showHomeIcon(){
-  const header = document.querySelector('header');
-  if(!document.querySelector('.home-icon')){
-    const homeBtn = document.createElement('button');
-    homeBtn.className = 'home-icon';
-    homeBtn.innerHTML = '🏠';
-    homeBtn.title = 'Home';
+for(let i=0;i<pointCount;i++){
+  points.push({
+    x:Math.random()*width,
+    y:Math.random()*height,
+    vx:(Math.random()-0.5)*0.5,
+    vy:(Math.random()-0.5)*0.5
+  });
+}
 
-    // Event handler yang langsung memanggil menu utama
-    homeBtn.addEventListener('click', () => {
-      showMainMenu();
-    });
+window.addEventListener('resize',()=>{ width=canvas.width=window.innerWidth; height=canvas.height=window.innerHeight; });
 
-    header.appendChild(homeBtn);
+function animateNetwork(){
+  ctx.clearRect(0,0,width,height);
+  for(let i=0;i<points.length;i++){
+    let p=points[i];
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0 || p.x>width) p.vx*=-1;
+    if(p.y<0 || p.y>height) p.vy*=-1;
+
+    for(let j=i+1;j<points.length;j++){
+      let q=points[j];
+      let dist = Math.hypot(p.x-q.x, p.y-q.y);
+      if(dist<150){
+        ctx.strokeStyle='rgba(102,252,241,'+(1-dist/150)+')';
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(p.x,p.y);
+        ctx.lineTo(q.x,q.y);
+        ctx.stroke();
+      }
+    }
+
+    ctx.fillStyle='#66fcf1';
+    ctx.globalAlpha=0.7;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,2,0,Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha=1;
   }
+  requestAnimationFrame(animateNetwork);
 }
-
-
-// ===== HOME PAGE =====
-function showHomePage(){
-  document.getElementById("container").innerHTML = `
-    <div class="home-wrapper">
-      <h2>Masukkan Kode untuk Akses</h2>
-      <input type="text" id="inputToken" placeholder="Masukkan kode..." class="home-input">
-      <button class="fixed-btn" onclick="checkToken()">Masuk</button>
-      <button class="fixed-btn" onclick="showLogin()">Login Admin</button>
-    </div>
-  `;
-}
-
-function checkToken(){
-  let userToken = document.getElementById("inputToken").value;
-  if(userToken === token){
-    showMainMenu();
-    showHomeIcon();
-  } else {
-    alert("Kode/Token salah!");
-  }
-}
-
-// ===== MENU UTAMA =====
-function showMainMenu(){
-  document.getElementById("container").innerHTML = `
-    <input type="text" id="searchInput" placeholder="Cari tanggal upload..." style="font-size:14px;padding:10px;margin-bottom:12px;width:100%;">
-    <div id="content"></div>
-  `;
-  document.getElementById("searchInput").addEventListener("input", ()=>{
-    searchData(document.getElementById("searchInput").value);
-  });
-  render();
-}
-
-function render(items = data){
-  let html = '<div class="grid">';
-  items.forEach((item,index)=>{
-    html += `
-      <div class="card" onclick="openLinks(${index})">
-        <img src="${item.image}">
-        <div class="card-content"><h3>${item.title||item.date}</h3><p>${item.date}</p></div>
-      </div>
-    `;
-  });
-  html += '</div>';
-  document.getElementById("content").innerHTML = html;
-}
-
-// ===== MODAL =====
-function animateModalLinks(modalBox){
-  const buttons = modalBox.querySelectorAll('a.btn');
-  buttons.forEach((btn,i)=>{
-    btn.style.opacity="0"; btn.style.transform="translateY(20px)";
-    setTimeout(()=>{
-      btn.style.transition = `all 0.4s ease ${i*0.08}s`;
-      btn.style.opacity="1"; btn.style.transform="translateY(0)";
-    },50);
-  });
-}
-
-function openLinks(index){
-  let item = data[index];
-  let modal = document.createElement("div");
-  modal.className = "modal";
-  modal.innerHTML = `
-    <div class="modal-box">
-      <h3>${item.title||item.date}</h3>
-      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
-        ${item.links.map(l=>`<a class="btn" href="${fixUrl(l.url)}" target="_blank">${l.name}</a>`).join('')}
-      </div>
-      <button class="btn" style="margin-top:10px;" onclick="this.closest('.modal').remove()">Tutup</button>
-    </div>
-  `;
-  modal.onclick = () => modal.remove();
-  modal.querySelector(".modal-box").onclick = e => e.stopPropagation();
-  document.body.appendChild(modal);
-  animateModalLinks(modal.querySelector(".modal-box"));
-}
-
-// ===== SEARCH =====
-function searchData(keyword){
-  let filtered = data.filter(d => d.date.includes(keyword) || (d.title && d.title.toLowerCase().includes(keyword.toLowerCase())));
-  render(filtered);
-}
-
-// ===== LOGIN ADMIN =====
-function showLogin(){
-  document.getElementById("container").innerHTML = `
-    <div class="admin-panel">
-      <h2>Login Admin</h2>
-      <input type="text" id="user" placeholder="Username">
-      <input type="password" id="pass" placeholder="Password">
-      <button class="btn" onclick="login()">Login</button>
-      <button class="btn" onclick="showHomePage()">Kembali</button>
-    </div>
-  `;
-}
-
-function login(){
-  let user = document.getElementById("user").value;
-  let pass = document.getElementById("pass").value;
-  if(user==="admin" && pass==="admin123"){ showAdminDashboard(); } 
-  else alert("Login salah!");
-}
-
-// ===== DASHBOARD ADMIN =====
-function showAdminDashboard(){
-  document.getElementById("container").innerHTML = `
-    <div class="admin-panel">
-      <h2>Admin Dashboard</h2>
-      <h3>Ubah Kode/Token Akses</h3>
-      <input type="text" id="newToken" placeholder="Masukkan kode baru">
-      <button class="btn" onclick="updateToken()">Simpan Token</button>
-      <hr>
-      <h3>Tambah Post</h3>
-      <input type="text" id="title" placeholder="Judul Post">
-      <input type="date" id="date">
-      <input type="file" id="image" accept="image/*">
-      <textarea id="urls" placeholder="Masukkan URL link, pisahkan spasi"></textarea>
-      <button class="btn" onclick="addDataMultiple()">Simpan Post</button>
-      <hr>
-      <h3>Daftar Upload</h3>
-      <div id="adminList"></div>
-      <button class="btn" onclick="showHomePage()">Kembali ke Halaman Awal</button>
-    </div>
-  `;
-  renderAdminList();
-}
-
-function updateToken(){
-  let newToken = document.getElementById("newToken").value.trim();
-  if(newToken){ token=newToken; localStorage.setItem("accessToken",token); alert("Token berhasil diubah!"); }
-  else alert("Masukkan kode baru!");
-}
-
-function addDataMultiple(){
-  let title = document.getElementById("title").value.trim();
-  let date = document.getElementById("date").value;
-  let imageFile = document.getElementById("image").files[0];
-  let urlsText = document.getElementById("urls").value.trim();
-  if(!date || !imageFile || !urlsText){ alert("Isi semua data!"); return; }
-  let reader = new FileReader();
-  reader.onload = function(e){
-    let links = urlsText.split(/\s+/).map(url=>({name:url,url:fixUrl(url)}));
-    data.push({title,date,image:e.target.result,links});
-    saveData(); renderAdminList();
-    document.getElementById("title").value=""; document.getElementById("date").value=""; document.getElementById("image").value=""; document.getElementById("urls").value="";
-  };
-  reader.readAsDataURL(imageFile);
-}
-
-function renderAdminList(){
-  let list = document.getElementById("adminList"); list.innerHTML="";
-  data.forEach((item,index)=>{
-    let card = document.createElement("div"); card.className="admin-card";
-    let titleElem = document.createElement("strong"); titleElem.textContent=item.title||item.date; titleElem.style.flex="1 1 100%"; card.appendChild(titleElem);
-
-    let delBtn = document.createElement("button"); delBtn.textContent="Hapus Post"; delBtn.className="delete";
-    delBtn.onclick = ()=>{ if(confirm("Yakin ingin hapus post ini?")){ data.splice(index,1); saveData(); renderAdminList(); } }; card.appendChild(delBtn);
-
-    item.links.forEach((l,li)=>{
-      let linkBtn = document.createElement("button"); linkBtn.textContent=l.name; linkBtn.className="edit";
-      linkBtn.onclick = ()=>{ if(confirm(`Hapus link "${l.name}"?`)){ item.links.splice(li,1); saveData(); renderAdminList(); } }; card.appendChild(linkBtn);
-    });
-
-    list.appendChild(card);
-  });
-}
-
-// ===== INISIALISASI =====
-document.querySelector(".logo").addEventListener("click", showMainMenu);
-window.addEventListener("load", showHomePage);
-
+animateNetwork();
 </script>
+
+<footer>
+  Created by YourName
+</footer>
+
 </body>
 </html>
