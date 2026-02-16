@@ -3,211 +3,270 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Video Website</title>
+<title>Modern Upload Gallery</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0A1F44, #1a3c8b);
-    color: white;
-    text-align: center;
+:root{
+    --primary:#0A1F44;
+    --secondary:#142b63;
+    --accent:#00d4ff;
+    --light:#ffffff;
 }
 
-.container {
-    width: 90%;
-    max-width: 900px;
-    margin: auto;
-    padding: 40px 0;
+*{
+    box-sizing:border-box;
 }
 
-.card {
-    background: white;
-    color: #0A1F44;
-    padding: 20px;
-    border-radius: 15px;
-    margin: 15px 0;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    transition: 0.3s;
+body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    color:white;
+    overflow-x:hidden;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,255,255,0.4);
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 30px;
 }
 
-button {
-    background: #00cfff;
-    border: none;
-    padding: 10px 20px;
-    color: white;
-    border-radius: 10px;
-    cursor: pointer;
-    margin: 5px;
+.logo{
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:1px;
 }
 
-button:hover {
-    background: #00aacc;
+.menu-btn{
+    font-size:26px;
+    cursor:pointer;
+    transition:0.3s;
+}
+.menu-btn:hover{
+    color:var(--accent);
 }
 
-input {
-    padding: 10px;
-    width: 90%;
-    margin: 8px 0;
-    border-radius: 8px;
-    border: none;
+.container{
+    width:90%;
+    max-width:1100px;
+    margin:auto;
+    padding-bottom:60px;
 }
 
-.hidden {
-    display: none;
+.search-box{
+    margin:20px 0;
+    text-align:center;
 }
 
-.top-menu {
-    position: absolute;
-    top: 15px;
-    left: 20px;
-    font-size: 26px;
-    cursor: pointer;
+.search-box input{
+    width:60%;
+    padding:12px;
+    border-radius:25px;
+    border:none;
+    outline:none;
+    font-size:14px;
 }
-iframe {
-    border-radius: 10px;
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    color:var(--primary);
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+    transition:0.4s;
+    animation:fadeIn 0.5s ease;
+}
+
+.card:hover{
+    transform:translateY(-8px) scale(1.02);
+    box-shadow:0 15px 35px rgba(0,212,255,0.4);
+}
+
+.card img{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+}
+
+.card-content{
+    padding:15px;
+    text-align:center;
+}
+
+.btn{
+    display:inline-block;
+    background:var(--accent);
+    color:white;
+    padding:8px 15px;
+    border-radius:20px;
+    text-decoration:none;
+    margin:5px;
+    transition:0.3s;
+}
+
+.btn:hover{
+    background:#00aacc;
+}
+
+.admin-panel{
+    background:white;
+    color:var(--primary);
+    padding:25px;
+    border-radius:20px;
+    max-width:500px;
+    margin:40px auto;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+
+.admin-panel input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:10px;
+    border:1px solid #ddd;
+}
+
+.hidden{
+    display:none;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
 <body>
 
-<div class="top-menu" onclick="showLogin()">⋮</div>
+<header>
+    <div class="logo">UPLOAD GALLERY</div>
+    <div class="menu-btn" onclick="showLogin()">⋮</div>
+</header>
 
 <div class="container">
 
-<h2 id="title">📅 Menu Berdasarkan Tanggal Upload</h2>
+<div class="search-box">
+    <input type="text" placeholder="Cari tanggal upload (contoh: 2026-02-16)" onkeyup="searchData(this.value)">
+</div>
 
 <div id="content"></div>
 
 </div>
 
 <script>
-let videos = JSON.parse(localStorage.getItem("videos")) || [];
+let data = JSON.parse(localStorage.getItem("galleryData")) || [];
 
-function saveData() {
-    localStorage.setItem("videos", JSON.stringify(videos));
+function save(){
+    localStorage.setItem("galleryData", JSON.stringify(data));
 }
 
-function renderHome() {
-    document.getElementById("title").innerText = "📅 Menu Berdasarkan Tanggal Upload";
-    let content = document.getElementById("content");
-    content.innerHTML = "";
-
-    videos.sort((a,b)=> new Date(b.date) - new Date(a.date));
-
-    videos.forEach((video, index) => {
-        content.innerHTML += `
+function render(items = data){
+    let html = `<div class="grid">`;
+    items.forEach((item,index)=>{
+        html+=`
         <div class="card">
-            <h3>${video.date}</h3>
-            <button onclick="openVideo(${index})">Lihat Video</button>
-        </div>`;
+            <img src="${item.image}">
+            <div class="card-content">
+                <h3>${item.date}</h3>
+                ${item.links.map(link=>`<a class="btn" href="${link.url}" target="_blank">${link.name}</a>`).join("")}
+            </div>
+        </div>
+        `;
     });
+    html+=`</div>`;
+    document.getElementById("content").innerHTML = html;
 }
 
-function openVideo(index) {
-    let video = videos[index];
-    document.getElementById("title").innerText = "Halaman Video";
-    let content = document.getElementById("content");
-
-    content.innerHTML = `
-    <div class="card">
-        <iframe width="100%" height="400"
-        src="${video.linkVideo}" allowfullscreen></iframe>
-        <br><br>
-        <a href="${video.linkButton}" target="_blank">
-            <button>🔗 Tombol Khusus</button>
-        </a>
-        <br><br>
-        <button onclick="renderHome()">⬅ Kembali</button>
-    </div>`;
+function searchData(keyword){
+    let filtered = data.filter(item=>item.date.includes(keyword));
+    render(filtered);
 }
 
-function showLogin() {
-    let content = document.getElementById("content");
-    document.getElementById("title").innerText = "Login Admin";
-
-    content.innerHTML = `
-    <div class="card">
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
-        <br><br>
-        <button onclick="renderHome()">Batal</button>
-    </div>`;
+function showLogin(){
+    document.getElementById("content").innerHTML = `
+    <div class="admin-panel">
+        <h2>Login Admin</h2>
+        <input type="text" id="user" placeholder="Username">
+        <input type="password" id="pass" placeholder="Password">
+        <button class="btn" onclick="login()">Login</button>
+    </div>
+    `;
 }
 
-function login() {
-    let user = document.getElementById("username").value;
-    let pass = document.getElementById("password").value;
-
-    if(user === "admin" && pass === "admin123") {
+function login(){
+    if(document.getElementById("user").value==="admin" &&
+       document.getElementById("pass").value==="admin123"){
         showDashboard();
-    } else {
+    }else{
         alert("Login salah!");
     }
 }
 
-function showDashboard() {
-    document.getElementById("title").innerText = "Dashboard Admin";
-    let content = document.getElementById("content");
-
-    content.innerHTML = `
-    <div class="card">
-        <h3>Tambah Video</h3>
+function showDashboard(){
+    document.getElementById("content").innerHTML=`
+    <div class="admin-panel">
+        <h2>Tambah Upload</h2>
         <input type="date" id="date">
-        <input type="text" id="linkVideo" placeholder="Link Embed Video">
-        <input type="text" id="linkButton" placeholder="Link Tombol Khusus">
-        <button onclick="addVideo()">Tambah</button>
-        <br><br>
-        <button onclick="renderHome()">⬅ Kembali</button>
+        <input type="file" id="image" accept="image/*">
+        <div id="linksArea"></div>
+        <button class="btn" onclick="addLinkField()">+ Tambah Link</button>
+        <button class="btn" onclick="addData()">Simpan</button>
+        <button class="btn" onclick="render()">Kembali</button>
     </div>
-    <div id="list"></div>`;
-
-    renderList();
+    `;
+    addLinkField();
 }
 
-function renderList() {
-    let list = document.getElementById("list");
-    list.innerHTML = "";
-
-    videos.forEach((video, index) => {
-        list.innerHTML += `
-        <div class="card">
-            ${video.date}
-            <br>
-            <button onclick="deleteVideo(${index})">Hapus</button>
-        </div>`;
-    });
+function addLinkField(){
+    document.getElementById("linksArea").innerHTML += `
+        <input type="text" placeholder="Nama Tombol" class="linkName">
+        <input type="text" placeholder="URL Link" class="linkURL">
+    `;
 }
 
-function addVideo() {
+function addData(){
     let date = document.getElementById("date").value;
-    let linkVideo = document.getElementById("linkVideo").value;
-    let linkButton = document.getElementById("linkButton").value;
+    let imageFile = document.getElementById("image").files[0];
 
-    if(date && linkVideo && linkButton) {
-        videos.push({date, linkVideo, linkButton});
-        saveData();
-        showDashboard();
-    } else {
-        alert("Isi semua data!");
+    if(!date || !imageFile){
+        alert("Isi tanggal & gambar");
+        return;
     }
+
+    let reader = new FileReader();
+    reader.onload = function(e){
+        let links=[];
+        let names=document.querySelectorAll(".linkName");
+        let urls=document.querySelectorAll(".linkURL");
+
+        for(let i=0;i<names.length;i++){
+            if(names[i].value && urls[i].value){
+                links.push({name:names[i].value, url:urls[i].value});
+            }
+        }
+
+        data.push({
+            date:date,
+            image:e.target.result,
+            links:links
+        });
+
+        save();
+        render();
+    };
+    reader.readAsDataURL(imageFile);
 }
 
-function deleteVideo(index) {
-    videos.splice(index, 1);
-    saveData();
-    showDashboard();
-}
-
-renderHome();
+render();
 </script>
 
 </body>
