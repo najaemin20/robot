@@ -3,28 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Modern Upload Gallery</title>
+<title>Premium Upload Gallery</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
     --primary:#0A1F44;
-    --secondary:#142b63;
+    --secondary:#162f75;
     --accent:#00d4ff;
-    --light:#ffffff;
+    --white:#ffffff;
 }
 
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
 body{
     margin:0;
     font-family:'Poppins',sans-serif;
     background:linear-gradient(135deg,var(--primary),var(--secondary));
     color:white;
-    overflow-x:hidden;
 }
 
 header{
@@ -37,17 +34,14 @@ header{
 .logo{
     font-weight:700;
     font-size:20px;
-    letter-spacing:1px;
 }
 
 .menu-btn{
     font-size:26px;
     cursor:pointer;
-    transition:0.3s;
+    transition:.3s;
 }
-.menu-btn:hover{
-    color:var(--accent);
-}
+.menu-btn:hover{color:var(--accent);}
 
 .container{
     width:90%;
@@ -57,8 +51,8 @@ header{
 }
 
 .search-box{
-    margin:20px 0;
     text-align:center;
+    margin-bottom:25px;
 }
 
 .search-box input{
@@ -67,7 +61,6 @@ header{
     border-radius:25px;
     border:none;
     outline:none;
-    font-size:14px;
 }
 
 .grid{
@@ -79,16 +72,16 @@ header{
 .card{
     background:white;
     color:var(--primary);
-    border-radius:18px;
+    border-radius:20px;
     overflow:hidden;
-    box-shadow:0 10px 25px rgba(0,0,0,0.25);
-    transition:0.4s;
-    animation:fadeIn 0.5s ease;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    cursor:pointer;
+    transition:.4s;
 }
 
 .card:hover{
-    transform:translateY(-8px) scale(1.02);
-    box-shadow:0 15px 35px rgba(0,212,255,0.4);
+    transform:translateY(-8px);
+    box-shadow:0 15px 40px rgba(0,212,255,0.5);
 }
 
 .card img{
@@ -102,19 +95,47 @@ header{
     text-align:center;
 }
 
+/* MODAL */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.7);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    animation:fadeIn .3s ease;
+}
+
+.modal-box{
+    background:white;
+    color:var(--primary);
+    padding:30px;
+    border-radius:20px;
+    width:90%;
+    max-width:400px;
+    text-align:center;
+    animation:scaleUp .3s ease;
+}
+
 .btn{
-    display:inline-block;
-    background:var(--accent);
-    color:white;
-    padding:8px 15px;
+    display:block;
+    margin:10px auto;
+    padding:10px 15px;
     border-radius:20px;
     text-decoration:none;
-    margin:5px;
-    transition:0.3s;
+    background:var(--accent);
+    color:white;
+    transition:.3s;
 }
 
 .btn:hover{
     background:#00aacc;
+}
+
+.close{
+    margin-top:15px;
+    background:#ccc;
+    color:black;
 }
 
 .admin-panel{
@@ -124,7 +145,6 @@ header{
     border-radius:20px;
     max-width:500px;
     margin:40px auto;
-    box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 .admin-panel input{
@@ -135,13 +155,13 @@ header{
     border:1px solid #ddd;
 }
 
-.hidden{
-    display:none;
-}
-
 @keyframes fadeIn{
-    from{opacity:0; transform:translateY(10px);}
-    to{opacity:1; transform:translateY(0);}
+    from{opacity:0;}
+    to{opacity:1;}
+}
+@keyframes scaleUp{
+    from{transform:scale(.8);}
+    to{transform:scale(1);}
 }
 </style>
 </head>
@@ -153,13 +173,10 @@ header{
 </header>
 
 <div class="container">
-
-<div class="search-box">
-    <input type="text" placeholder="Cari tanggal upload (contoh: 2026-02-16)" onkeyup="searchData(this.value)">
-</div>
-
-<div id="content"></div>
-
+    <div class="search-box">
+        <input type="text" placeholder="Cari tanggal upload..." onkeyup="searchData(this.value)">
+    </div>
+    <div id="content"></div>
 </div>
 
 <script>
@@ -169,46 +186,54 @@ function save(){
     localStorage.setItem("galleryData", JSON.stringify(data));
 }
 
-function render(items = data){
-    let html = `<div class="grid">`;
+function render(items=data){
+    let html='<div class="grid">';
     items.forEach((item,index)=>{
         html+=`
-        <div class="card">
+        <div class="card" onclick="openLinks(${index})">
             <img src="${item.image}">
             <div class="card-content">
                 <h3>${item.date}</h3>
-                ${item.links.map(link=>`<a class="btn" href="${link.url}" target="_blank">${link.name}</a>`).join("")}
+                <small>Klik untuk lihat link</small>
             </div>
-        </div>
-        `;
+        </div>`;
     });
-    html+=`</div>`;
-    document.getElementById("content").innerHTML = html;
+    html+='</div>';
+    document.getElementById("content").innerHTML=html;
+}
+
+function openLinks(index){
+    let item=data[index];
+    let modal=`
+    <div class="modal" onclick="this.remove()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <h3>${item.date}</h3>
+            ${item.links.map(l=>`<a class="btn" href="${l.url}" target="_blank">${l.name}</a>`).join("")}
+            <button class="btn close" onclick="this.closest('.modal').remove()">Tutup</button>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML("beforeend",modal);
 }
 
 function searchData(keyword){
-    let filtered = data.filter(item=>item.date.includes(keyword));
+    let filtered=data.filter(d=>d.date.includes(keyword));
     render(filtered);
 }
 
 function showLogin(){
-    document.getElementById("content").innerHTML = `
+    document.getElementById("content").innerHTML=`
     <div class="admin-panel">
         <h2>Login Admin</h2>
         <input type="text" id="user" placeholder="Username">
         <input type="password" id="pass" placeholder="Password">
         <button class="btn" onclick="login()">Login</button>
-    </div>
-    `;
+    </div>`;
 }
 
 function login(){
-    if(document.getElementById("user").value==="admin" &&
-       document.getElementById("pass").value==="admin123"){
+    if(user.value==="admin" && pass.value==="admin123"){
         showDashboard();
-    }else{
-        alert("Login salah!");
-    }
+    }else alert("Login salah!");
 }
 
 function showDashboard(){
@@ -221,45 +246,32 @@ function showDashboard(){
         <button class="btn" onclick="addLinkField()">+ Tambah Link</button>
         <button class="btn" onclick="addData()">Simpan</button>
         <button class="btn" onclick="render()">Kembali</button>
-    </div>
-    `;
+    </div>`;
     addLinkField();
 }
 
 function addLinkField(){
-    document.getElementById("linksArea").innerHTML += `
+    document.getElementById("linksArea").innerHTML+=`
         <input type="text" placeholder="Nama Tombol" class="linkName">
-        <input type="text" placeholder="URL Link" class="linkURL">
-    `;
+        <input type="text" placeholder="URL Link" class="linkURL">`;
 }
 
 function addData(){
-    let date = document.getElementById("date").value;
-    let imageFile = document.getElementById("image").files[0];
+    let date=document.getElementById("date").value;
+    let imageFile=document.getElementById("image").files[0];
+    if(!date||!imageFile){alert("Isi semua data");return;}
 
-    if(!date || !imageFile){
-        alert("Isi tanggal & gambar");
-        return;
-    }
-
-    let reader = new FileReader();
-    reader.onload = function(e){
+    let reader=new FileReader();
+    reader.onload=function(e){
         let links=[];
         let names=document.querySelectorAll(".linkName");
         let urls=document.querySelectorAll(".linkURL");
-
         for(let i=0;i<names.length;i++){
             if(names[i].value && urls[i].value){
-                links.push({name:names[i].value, url:urls[i].value});
+                links.push({name:names[i].value,url:urls[i].value});
             }
         }
-
-        data.push({
-            date:date,
-            image:e.target.result,
-            links:links
-        });
-
+        data.push({date:date,image:e.target.result,links:links});
         save();
         render();
     };
