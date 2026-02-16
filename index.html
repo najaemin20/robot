@@ -104,6 +104,7 @@ header{
     justify-content:center;
     align-items:center;
     animation:fadeIn .3s ease;
+    z-index:1000;
 }
 
 .modal-box{
@@ -182,10 +183,12 @@ header{
 <script>
 let data = JSON.parse(localStorage.getItem("galleryData")) || [];
 
+// Simpan ke localStorage
 function save(){
     localStorage.setItem("galleryData", JSON.stringify(data));
 }
 
+// Render grid gambar
 function render(items=data){
     let html='<div class="grid">';
     items.forEach((item,index)=>{
@@ -202,24 +205,34 @@ function render(items=data){
     document.getElementById("content").innerHTML=html;
 }
 
+// Open modal daftar link
 function openLinks(index){
     let item=data[index];
     let modal=`
     <div class="modal" onclick="this.remove()">
         <div class="modal-box" onclick="event.stopPropagation()">
             <h3>${item.date}</h3>
-            ${item.links.map(l=>`<a class="btn" href="${l.url}" target="_blank">${l.name}</a>`).join("")}
+            ${item.links.map(l=>{
+                // pastikan link otomatis https:// jika tidak ada
+                let url=l.url.trim();
+                if(!url.startsWith("http://") && !url.startsWith("https://")){
+                    url="https://"+url;
+                }
+                return `<a class="btn" href="${url}" target="_blank" rel="noopener noreferrer">${l.name}</a>`;
+            }).join("")}
             <button class="btn close" onclick="this.closest('.modal').remove()">Tutup</button>
         </div>
     </div>`;
     document.body.insertAdjacentHTML("beforeend",modal);
 }
 
+// Search berdasarkan tanggal
 function searchData(keyword){
     let filtered=data.filter(d=>d.date.includes(keyword));
     render(filtered);
 }
 
+// Show admin login
 function showLogin(){
     document.getElementById("content").innerHTML=`
     <div class="admin-panel">
@@ -230,12 +243,16 @@ function showLogin(){
     </div>`;
 }
 
+// Login admin
 function login(){
-    if(user.value==="admin" && pass.value==="admin123"){
+    let user=document.getElementById("user").value;
+    let pass=document.getElementById("pass").value;
+    if(user==="admin" && pass==="admin123"){
         showDashboard();
     }else alert("Login salah!");
 }
 
+// Admin dashboard tambah gambar & link
 function showDashboard(){
     document.getElementById("content").innerHTML=`
     <div class="admin-panel">
@@ -250,16 +267,19 @@ function showDashboard(){
     addLinkField();
 }
 
+// Tambah field link
 function addLinkField(){
-    document.getElementById("linksArea").innerHTML+=`
+    document.getElementById("linksArea").insertAdjacentHTML("beforeend",`
         <input type="text" placeholder="Nama Tombol" class="linkName">
-        <input type="text" placeholder="URL Link" class="linkURL">`;
+        <input type="text" placeholder="URL Link" class="linkURL">
+    `);
 }
 
+// Simpan data baru
 function addData(){
     let date=document.getElementById("date").value;
     let imageFile=document.getElementById("image").files[0];
-    if(!date||!imageFile){alert("Isi semua data");return;}
+    if(!date || !imageFile){alert("Isi tanggal & gambar");return;}
 
     let reader=new FileReader();
     reader.onload=function(e){
@@ -268,7 +288,11 @@ function addData(){
         let urls=document.querySelectorAll(".linkURL");
         for(let i=0;i<names.length;i++){
             if(names[i].value && urls[i].value){
-                links.push({name:names[i].value,url:urls[i].value});
+                let urlInput=urls[i].value.trim();
+                if(!urlInput.startsWith("http://") && !urlInput.startsWith("https://")){
+                    urlInput="https://"+urlInput;
+                }
+                links.push({name:names[i].value,url:urlInput});
             }
         }
         data.push({date:date,image:e.target.result,links:links});
